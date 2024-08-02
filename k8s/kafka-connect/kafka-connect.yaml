@@ -1,0 +1,55 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnect
+metadata:
+  name: prod-connect-cluster
+  annotations:
+    strimzi.io/use-connector-resources: "true"
+spec:
+  template:
+    pod:
+      imagePullSecrets:
+        - name: secret-roniepaolo-docker
+  version: 3.7.1
+  replicas: 1
+  bootstrapServers: prod-cluster-kafka-bootstrap:9092
+  config:
+    group.id: prod-connect-cluster
+    offset.storage.topic: prod-connect-cluster-offsets
+    config.storage.topic: prod-connect-cluster-configs
+    status.storage.topic: prod-connect-cluster-status
+    config.storage.replication.factor: -1
+    offset.storage.replication.factor: -1
+    status.storage.replication.factor: -1
+    key.converter: org.apache.kafka.connect.storage.StringConverter
+    value.converter: org.apache.kafka.connect.storage.StringConverter
+    key.converter.schemas.enable: false
+    value.converter.schemas.enable: false
+    config.providers: env
+    config.providers.env.class: io.strimzi.kafka.EnvVarConfigProvider
+  build:
+    output:
+      type: docker
+      image: docker.io/roniepaolo/portfolio:connect-cluster
+      pushSecret: secret-roniepaolo-docker
+    plugins:
+      - name: camel-http
+        artifacts:
+          - type: maven
+            url: https://repo.maven.apache.org/maven2
+            group: org.apache.camel.kafkaconnector
+            artifact: camel-http-source-kafka-connector
+            version: 4.4.2
+  externalConfiguration:
+    env:
+      - name: FINNHUB_APIKEY
+        valueFrom:
+          secretKeyRef:
+            name: secret-roniepaolo-finnhub
+            key: apiKey
+  resources:
+    requests:
+      memory: 1Gi
+      cpu: 500m
+    limits:
+      memory: 2Gi
+      cpu: 1.0

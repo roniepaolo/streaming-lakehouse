@@ -32,20 +32,20 @@ spec:
       image: docker.io/roniepaolo/portfolio:connect-cluster
       pushSecret: secret-roniepaolo-docker
     plugins:
-      - name: camel-http
+      - name: camel-telegram
         artifacts:
           - type: maven
             url: https://repo.maven.apache.org/maven2
             group: org.apache.camel.kafkaconnector
-            artifact: camel-http-source-kafka-connector
-            version: 4.4.2
+            artifact: camel-telegram-kafka-connector
+            version: 0.11.5
   externalConfiguration:
     env:
-      - name: FINNHUB_APIKEY
+      - name: TELEGRAM_TOKEN
         valueFrom:
           secretKeyRef:
-            name: secret-roniepaolo-finnhub
-            key: apiKey
+            name: secret-roniepaolo-telegram
+            key: token
   resources:
     requests:
       memory: 1Gi

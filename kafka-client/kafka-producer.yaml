@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: kafka-producer
+  name: kafka-producer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka-producer
+  template:
+    metadata:
+      labels:
+        app: kafka-producer
+    spec:
+      containers:
+        - name: kafka-producer
+          image: docker.io/roniepaolo/twitch-chat:latest
+          env:
+            - name: KAFKA_PRODUCER_BOOTSTRAP_SERVERS
+              value: prod-cluster-kafka-bootstrap:9092
+            - name: KAFKA_PRODUCER_ACKS
+              value: "all"
+            - name: KAFKA_PRODUCER_KEY_SERIALIZER
+              value: "org.apache.kafka.common.serialization.StringSerializer"
+            - name: KAFKA_PRODUCER_VALUE_SERIALIZER
+              value: "org.apache.kafka.common.serialization.StringSerializer"

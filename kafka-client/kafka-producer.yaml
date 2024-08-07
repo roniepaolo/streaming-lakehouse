@@ -18,6 +18,10 @@ spec:
         - name: kafka-producer
           image: docker.io/roniepaolo/twitch-chat:latest
           env:
+            - name: TWITCH_CHANNELS
+              value: "roniepaolo"
+            - name: KAFKA_TOPIC
+              value: twitch_chat
             - name: KAFKA_PRODUCER_BOOTSTRAP_SERVERS
               value: prod-cluster-kafka-bootstrap:9092
             - name: KAFKA_PRODUCER_ACKS

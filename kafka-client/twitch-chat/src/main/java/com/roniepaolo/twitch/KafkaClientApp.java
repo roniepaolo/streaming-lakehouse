@@ -4,8 +4,8 @@ import com.roniepaolo.twitch.sources.twitch.TwitchSource;
 
 public class KafkaClientApp {
     public static void main(String[] args) {
-        String[] channels = {"roniepaolo"};
-        String topic = "twitch_chat";
+        String[] channels = System.getenv("TWITCH_CHANNELS").split(",\\s*");
+        String topic = System.getenv("KAFKA_TOPIC");
         KafkaHelper kh = new KafkaHelper(new TwitchSource(channels));
         kh.produceSource(topic);
     }

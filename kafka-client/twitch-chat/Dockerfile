@@ -1,7 +1,7 @@
 FROM azul/zulu-openjdk-alpine:17-jre-latest
 
 RUN set -eux; \
-    apk add --no-cache --upgrade curl bash findutils
+    apk add --no-cache --upgrade bash
 
 COPY --chmod=+x docker-entrypoint.sh /
 COPY ./src/main/resources/log4j2.properties /bin/

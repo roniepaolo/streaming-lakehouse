@@ -11,17 +11,3 @@ spec:
   config:
     retention.ms: 2629800000
     segment.bytes: 107374182
----
-apiVersion: kafka.strimzi.io/v1beta2
-kind: KafkaTopic
-metadata:
-  name: camel-telegram
-  labels:
-    strimzi.io/cluster: prod-cluster
-spec:
-  topicName: camel_telegram
-  partitions: 1
-  replicas: 1
-  config:
-    retention.ms: 2629800000
-    segment.bytes: 107374182

@@ -3,10 +3,11 @@ package com.roniepaolo.twitch;
 import java.util.Properties;
 
 import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.Producer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.roniepaolo.twitch.sources.KafkaSource;
+import com.roniepaolo.twitch.sources.twitch.TwitchMessageKey;
+import com.roniepaolo.twitch.sources.twitch.TwitchMessageValue;
 import com.roniepaolo.twitch.utils.KafkaConfig;
 import com.roniepaolo.twitch.utils.KafkaProducerConfig;
 
@@ -26,7 +27,8 @@ public class KafkaHelper {
     }
 
     public void produceSource(String topic) {
-        Producer<String, String> producer = new KafkaProducer<>(producerConf);
+        KafkaProducer<TwitchMessageKey, TwitchMessageValue> producer =
+                new KafkaProducer<>(producerConf);
         try {
             log.info("Kafka producer is starting writing in topic {}", topic);
             kafkaSource.produce(producer, topic);

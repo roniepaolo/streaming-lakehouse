@@ -1,11 +1,10 @@
 package com.roniepaolo.twitch.sources.twitch;
 
-import org.apache.kafka.clients.producer.Producer;
+import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.TwitchClient;
 import com.github.twitch4j.TwitchClientBuilder;
@@ -32,16 +31,23 @@ public class TwitchSource implements KafkaSource {
     }
 
     @Override
-    public void produce(Producer<String, String> producer, String topic) {
+    public void produce(
+            KafkaProducer<TwitchMessageKey, TwitchMessageValue> producer,
+            String topic) {
         eventHandler.onEvent(IRCMessageEvent.class, event -> {
             String channel = event.getChannel().getName();
             EventUser eventUser = event.getUser();
             String user = eventUser == null ? "" : eventUser.getName();
             String message = event.getMessage().orElseGet(String::new);
-            String twitchMessage =
-                    generateTwitchMessage(channel, user, message);
-            ProducerRecord<String, String> record =
-                    new ProducerRecord<>(topic, twitchMessage);
+            long timestamp = event.getFiredAtInstant().toEpochMilli();
+            TwitchMessageKey twitchMessageKey =
+                    new TwitchMessageKey(channel, user, timestamp);
+            TwitchMessageValue twitchMessageValue =
+                    new TwitchMessageValue(channel, user, message, timestamp);
+
+            ProducerRecord<TwitchMessageKey, TwitchMessageValue> record =
+                    new ProducerRecord<>(topic, twitchMessageKey,
+                            twitchMessageValue);
             producer.send(record, (RecordMetadata metadata, Exception e) -> {
                 if (e != null) {
                     log.error("Exception when producing message: {}",
@@ -54,15 +60,4 @@ public class TwitchSource implements KafkaSource {
         });
     }
 
-    private static String generateTwitchMessage(String channel, String user,
-            String message) {
-        ObjectMapper mapper = new ObjectMapper();
-        TwitchMessage twitchMessage = new TwitchMessage(channel, user, message);
-        try {
-            return mapper.writeValueAsString(twitchMessage);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
 }

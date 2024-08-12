@@ -19,14 +19,16 @@ spec:
           image: docker.io/roniepaolo/twitch-chat:latest
           env:
             - name: TWITCH_CHANNELS
-              value: "roniepaolo"
+              value: roniepaolo
             - name: KAFKA_TOPIC
               value: twitch_chat
             - name: KAFKA_PRODUCER_BOOTSTRAP_SERVERS
               value: prod-cluster-kafka-bootstrap:9092
             - name: KAFKA_PRODUCER_ACKS
-              value: "all"
+              value: all
             - name: KAFKA_PRODUCER_KEY_SERIALIZER
-              value: "org.apache.kafka.common.serialization.StringSerializer"
+              value: io.confluent.kafka.serializers.KafkaAvroSerializer
             - name: KAFKA_PRODUCER_VALUE_SERIALIZER
-              value: "org.apache.kafka.common.serialization.StringSerializer"
+              value: io.confluent.kafka.serializers.KafkaAvroSerializer
+            - name: KAFKA_PRODUCER_SCHEMA_REGISTRY_URL
+              value: http://schemaregistry-0-internal:8081

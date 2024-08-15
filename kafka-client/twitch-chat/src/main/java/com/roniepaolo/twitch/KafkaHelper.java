@@ -1,21 +1,20 @@
 package com.roniepaolo.twitch;
 
-import java.util.Properties;
-
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import com.roniepaolo.twitch.sources.KafkaSource;
 import com.roniepaolo.twitch.sources.twitch.TwitchMessageKey;
 import com.roniepaolo.twitch.sources.twitch.TwitchMessageValue;
 import com.roniepaolo.twitch.utils.KafkaConfig;
 import com.roniepaolo.twitch.utils.KafkaProducerConfig;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.util.Properties;
 
 public class KafkaHelper {
-    private Properties producerConf;
-    private KafkaSource kafkaSource;
-
     private static final Logger log = LogManager.getLogger(KafkaHelper.class);
+    private final Properties producerConf;
+    private final KafkaSource kafkaSource;
 
     public KafkaHelper(KafkaSource kafkaSource) {
         KafkaConfig config = new KafkaProducerConfig();
@@ -32,14 +31,14 @@ public class KafkaHelper {
         try {
             log.info("Kafka producer is starting writing in topic {}", topic);
             kafkaSource.produce(producer, topic);
-            while (true) {
+            while (!Thread.currentThread().isInterrupted()) {
                 Thread.sleep(1000);
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            log.error("Thread was interrupted: {}", e);
+            kafkaSource.stop(producer);
+            log.error("Thread was interrupted: {}", e.getMessage());
         } finally {
-            producer.close();
             log.info("Kafka producer is closed");
         }
     }

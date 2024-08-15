@@ -1,22 +1,21 @@
 package com.roniepaolo.twitch.sources.twitch;
 
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.clients.producer.RecordMetadata;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.TwitchClient;
 import com.github.twitch4j.TwitchClientBuilder;
 import com.github.twitch4j.chat.events.channel.IRCMessageEvent;
 import com.github.twitch4j.common.events.domain.EventUser;
 import com.roniepaolo.twitch.sources.KafkaSource;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class TwitchSource implements KafkaSource {
-    private SimpleEventHandler eventHandler;
-    private TwitchClient client;
-
     private static final Logger log = LogManager.getLogger(TwitchSource.class);
+    private final SimpleEventHandler eventHandler;
+    private final TwitchClient client;
 
     public TwitchSource(String[] twitchChannels) {
         this.client =
@@ -60,4 +59,10 @@ public class TwitchSource implements KafkaSource {
         });
     }
 
+    @Override
+    public void stop(
+            KafkaProducer<TwitchMessageKey, TwitchMessageValue> producer) {
+        client.close();
+        producer.close();
+    }
 }

@@ -35,11 +35,9 @@ public class KafkaHelper {
                 Thread.sleep(1000);
             }
         } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+            log.info("Thread was interrupted: {}", e.getMessage());
             kafkaSource.stop(producer);
-            log.error("Thread was interrupted: {}", e.getMessage());
-        } finally {
-            log.info("Kafka producer is closed");
+            Thread.currentThread().interrupt();
         }
     }
 }

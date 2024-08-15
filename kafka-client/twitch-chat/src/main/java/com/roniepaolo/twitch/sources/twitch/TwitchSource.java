@@ -63,6 +63,8 @@ public class TwitchSource implements KafkaSource {
     public void stop(
             KafkaProducer<TwitchMessageKey, TwitchMessageValue> producer) {
         client.close();
+        log.info("Twitch client is closed.");
         producer.close();
+        log.info("Kafka producer is closed.");
     }
 }
